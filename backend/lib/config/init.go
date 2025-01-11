@@ -5,13 +5,13 @@ import (
 	"log"
 
 	"github.com/jinzhu/gorm"
-    _"github.com/jinzhu/gorm/dialects/postgres"
-    "github.com/spf13/viper"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/spf13/viper"
 )
 
 var DB *gorm.DB
 
-func InitDB()  {
+func ConnectDB() *gorm.DB  {
 	viper.SetConfigFile(".env")
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -28,13 +28,13 @@ func InitDB()  {
 
 	var err error
 
-	DB, err = gorm.Open("postgres", dbUrl)
-
+	db, err := gorm.Open("postgres", dbUrl)
 	if err != nil {
 		log.Fatalf("Could not connect to database :%v", err)
 	}
 
 	log.Println("Database Connection established succcessfully")
+	return db
 }
 
 func CloseDB()  {
