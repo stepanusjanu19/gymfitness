@@ -13,7 +13,7 @@ const (
 	Admin   Role = "admin"
 	Trainer Role = "trainer"
 	Member  Role = "member"
-	Guest   Role = "Guest"
+	Guest   Role = "guest"
 )
 
 var ValidRoles = []string{string(Admin), string(Trainer), string(Member), string(Guest)}
