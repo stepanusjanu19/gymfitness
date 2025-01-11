@@ -9,8 +9,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var DB *gorm.DB
-
 func ConnectDB() *gorm.DB  {
 	viper.SetConfigFile(".env")
 
@@ -37,11 +35,3 @@ func ConnectDB() *gorm.DB  {
 	return db
 }
 
-func CloseDB()  {
-	if DB != nil {
-		DB.Close()
-		log.Println("Database connection closed")
-	} else {
-		log.Println("Database connection is nil")
-	}
-}

@@ -1,29 +1,28 @@
 package database
 
 import (
+	"backend/lib/helpers"
+	"backend/src/model"
 	"fmt"
 	"log"
-	"backend/src/model"
+
 	"github.com/jinzhu/gorm"
-	"backend/lib/helpers"
 )
 
 var usersDump = []model.User{
 	model.User{
 		FirstName: "4DMI1N",
-		LastName: "2025",
-		Email: "adm1nGym2025@gmail.com",
-		Password: "",
-		Phone: "123456789",
-		Image: "https://cdn-icons-png.flaticon.com/512/6024/6024190.png",
-		IsActive: true,
-		Role: model.Admin,
+		LastName:  "2025",
+		Email:     "adm1nGym2025@gmail.com",
+		Phone:     "123456789",
+		Image:     "https://cdn-icons-png.flaticon.com/512/6024/6024190.png",
+		IsActive:  true,
+		Role:      model.Admin,
 	},
 	model.User{
 		FirstName: "John",
 		LastName:  "Doe",
 		Email:     "john.doe@gmail.com",
-		Password:  "",
 		Phone:     "987654321",
 		Image:     "https://cdn-icons-png.flaticon.com/512/6024/6024190.png",
 		IsActive:  true,
@@ -33,7 +32,6 @@ var usersDump = []model.User{
 		FirstName: "Jane",
 		LastName:  "Smith",
 		Email:     "jane.smith@gmail.com",
-		Password:  "",
 		Phone:     "1122334455",
 		Image:     "https://cdn-icons-png.flaticon.com/512/6024/6024190.png",
 		IsActive:  true,
@@ -41,13 +39,15 @@ var usersDump = []model.User{
 	},
 }
 
-func LoadSeeders(db *gorm.DB)  {
+func LoadSeeders(db *gorm.DB) {
 	if db == nil {
-        fmt.Println("Database connection is nil")
-        return
-    }
-	for i, user := range usersDump {
+		fmt.Println("Database connection is nil")
+		return
+	}
+	for _, user := range usersDump {
+
 		var password string
+
 		if user.Role == model.Admin {
 			password = "4p4j4B01EH"
 		} else {
@@ -57,7 +57,9 @@ func LoadSeeders(db *gorm.DB)  {
 		if err != nil {
 			log.Fatalf("Error hashing password: %v", err)
 		}
-		usersDump[i].Password = hashedPassword
+
+		user.Password = hashedPassword
+
 		err = db.Debug().Create(&user).Error
 		if err != nil {
 			log.Fatalf("cannot seed data: %v", err)

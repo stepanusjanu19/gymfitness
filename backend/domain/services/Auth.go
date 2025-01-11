@@ -10,16 +10,17 @@ import (
 	"html"
 	"log"
 	"strings"
-
+	"os"
 	"github.com/jinzhu/gorm"
 )
 
 func getDB() *gorm.DB {
-	if config.DB == nil {
-		log.Println("Initializing database connection...")
-		config.ConnectDB()
+	db := config.ConnectDB()
+	if db == nil {
+		log.Fatalf("Failed to initialize database connection")
+		os.Exit(1)
 	}
-	return config.DB.Debug()
+	return db.Debug()
 }
 
 func Login(email, password string) (model.User, error) {
@@ -29,8 +30,7 @@ func Login(email, password string) (model.User, error) {
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
 		return user, formatstring.FormatStringError("userfound")
 	}
-	err := helpers.VerifyPassword(password, user.Password)
-	if err {
+	if !helpers.VerifyPassword(password, user.Password) {
 		return user, formatstring.FormatStringError("hashedPassword")
 	}
 

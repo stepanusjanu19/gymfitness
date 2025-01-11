@@ -23,9 +23,9 @@ type User struct {
 	FirstName        string             `gorm:"size:255;not null" json:"firstname"`
 	LastName         string             `gorm:"size:255" json:"lastname"`
 	FullName         string             `gorm:"-" json:"fullname"`
-	Email            string             `gorm:"unique; not null" json:"email"`
-	Password         string             `gorm:"not null" json:"password"`
-	Phone            string             `json:"phone"`
+	Email            string             `gorm:"size:255;unique;not null" json:"email"`
+	Password         string             `gorm:"size:255;not null" json:"password"`
+	Phone            string             `gorm:"size:255" json:"phone"`
 	Image            string             `json:"image"`
 	IsActive         bool               `gorm:"default:false" json:"is_active"`
 	Role             Role               `gorm:"type:role_user; default: 'guest'" json:"role"`
