@@ -4,19 +4,29 @@ import (
 	"backend/domain/requests"
 	"backend/lib/config"
 	"backend/lib/helpers"
-	"backend/src/model"
 	"backend/lib/pkg/mails"
 	"backend/lib/utils/formatstring"
+	"backend/src/model"
 	"html"
+	"log"
 	"strings"
+
+	"github.com/jinzhu/gorm"
 )
 
-var dbConfig = config.DB.Debug();
+func getDB() *gorm.DB {
+	if config.DB == nil {
+		log.Println("Initializing database connection...")
+		config.ConnectDB()
+	}
+	return config.DB.Debug()
+}
 
 func Login(email, password string) (model.User, error) {
 	var user model.User
+	db := getDB()
 
-	if err := dbConfig.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
 		return user, formatstring.FormatStringError("userfound")
 	}
 	err := helpers.VerifyPassword(password, user.Password)
@@ -29,8 +39,9 @@ func Login(email, password string) (model.User, error) {
 
 func SignUp(request *requests.Register) (model.User, error) {
 	var existingUser model.User
+	db := getDB()
 
-	if err := dbConfig.Where("email = ?", request.Email).First(&existingUser).Error; err == nil {
+	if err := db.Where("email = ?", request.Email).First(&existingUser).Error; err == nil {
 		return existingUser, formatstring.FormatStringError("emailalready")
 	}
 
@@ -57,7 +68,7 @@ func SignUp(request *requests.Register) (model.User, error) {
 		}
 	}
 
-	transactionData := dbConfig.Begin()
+	transactionData := db.Begin()
 
 	if transactionData.Error != nil {
 		return model.User{}, formatstring.FormatStringErrorWithDetails("transactionStartError", transactionData.Error)
@@ -87,13 +98,13 @@ func SignUp(request *requests.Register) (model.User, error) {
 		return newUser, formatstring.FormatStringErrorWithDetails("otpEmailError", err)
 	}
 
-	verificationUser := model.VerificationUser {
+	verificationUser := model.VerificationUser{
 		UserId: newUser.UserId,
-		Otp: otpGenerate,
+		Otp:    otpGenerate,
 		IsUsed: false,
 	}
 
-	if err := transactionData.Create(&verificationUser).Error; err != nil{
+	if err := transactionData.Create(&verificationUser).Error; err != nil {
 		transactionData.Rollback()
 		return newUser, formatstring.FormatStringErrorWithDetails("otpSaveError", err)
 	}
