@@ -1,9 +1,15 @@
 {
-    "version": 2,
-    "functions": {
-      "api/*.go": {
-        "runtime": "vercel-go@1.1.0"
-      }
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.go",
+      "use": "@vercel/go"
     }
-  }
-  
+  ],
+  "routes": [
+    {
+      "src": "/api/gym",
+      "dest": "/api/index.go"
+    }
+  ]
+}
