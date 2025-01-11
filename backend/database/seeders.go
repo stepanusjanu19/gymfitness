@@ -13,7 +13,7 @@ var usersDump = []model.User{
 	model.User{
 		FirstName: "4DMI1N",
 		LastName:  "2025",
-		Email:     "adm1nGym2025@gmail.com",
+		Email:     "admin@gmail.com",
 		Phone:     "123456789",
 		Image:     "https://cdn-icons-png.flaticon.com/512/6024/6024190.png",
 		IsActive:  true,

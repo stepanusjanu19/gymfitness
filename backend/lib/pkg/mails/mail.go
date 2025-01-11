@@ -9,30 +9,26 @@ import (
 )
 
 func SendMailerOTP(email string, otp int) error {
-	viper.AutomaticEnv()
 
-	viper.SetEnvPrefix("MAILTRAP")
-	viper.BindEnv("HOST")
-	viper.BindEnv("TEMPLATE_ID")
-	viper.BindEnv("TOKEN")
+	viper.SetConfigFile(".env")
 
-	viper.SetEnvPrefix("SMTP")
-	viper.BindEnv("FROM_NAME")
-	viper.BindEnv("FROM_EMAIL")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
 
-	mailtrapURL := viper.GetString("HOST") + "/api/send"
+	mailtrapURL := viper.GetString("MAIL_HOST") + "/api/send"
 
 	emailData := requests.MailTrapRequestTemplate{
 		From: requests.EmailAddress{
-			Email: viper.GetString("FROM_EMAIL"),
-			Name: viper.GetString("FROM_NAME"),
+			Email: viper.GetString("MAIL_FROM_EMAIL2"),
+			Name: viper.GetString("MAIL_FROM_NAME"),
 		},
 		To: []requests.EmailAddress{
 			{
 				Email: email,
 			},
 		},
-		TemplateUUID: viper.GetString("TEMPLATE_ID"),
+		TemplateUUID: viper.GetString("MAIL_TEMPLATE_ID"),
 		TemplateVariables: requests.OTPCode{
 			OTPCode: strconv.Itoa(otp),
 		},
@@ -41,7 +37,7 @@ func SendMailerOTP(email string, otp int) error {
 	methodData := structure.ConstructorInstance()
 
 	headerValidation := make(map[string]string)
-	headerValidation["Authorization"] = "Bearer" + viper.GetString("TOKEN")
+	headerValidation["Authorization"] = "Bearer " + viper.GetString("MAIL_TOKEN")
 	headerValidation["Content-Type"] = "application/json"
 
 	for key, value := range headerValidation {
