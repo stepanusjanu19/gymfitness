@@ -14,6 +14,8 @@ func FormatStringError(err string) error {
 		return errors.New("Incorrect password")
 	case strings.Contains(err, "userfound"):
 		return errors.New("User not found")
+	case strings.Contains(err, "userinactive"):
+		return errors.New("User its inactive")
 	case strings.Contains(err, "transactionStartError"):
 		return errors.New("Error starting database transaction")
 	case strings.Contains(err, "userCreationError"):

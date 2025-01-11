@@ -9,8 +9,9 @@ import (
 	"backend/src/model"
 	"html"
 	"log"
-	"strings"
 	"os"
+	"strings"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -30,6 +31,11 @@ func Login(email, password string) (model.User, error) {
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
 		return user, formatstring.FormatStringError("userfound")
 	}
+
+	if !user.IsActive {
+		return user, formatstring.FormatStringError("userinactive")
+	}
+
 	if !helpers.VerifyPassword(password, user.Password) {
 		return user, formatstring.FormatStringError("hashedPassword")
 	}
