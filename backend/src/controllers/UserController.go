@@ -5,6 +5,7 @@ import (
 	"backend/domain/services"
 	"backend/lib/helpers"
 	"backend/lib/utils/response"
+	"backend/domain/responses"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -60,5 +61,13 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	response.JSON(c.Writer, http.StatusCreated, gin.H{"message": "Register User Succesfully", "user": user})
+	filterRegister := responses.SignUpResponse {
+		Fullname: user.FullName,
+		Email: user.Email,
+		Phone: user.Phone,
+		Image: user.Image,
+		IsActive: user.IsActive,
+	}
+
+	response.JSON(c.Writer, http.StatusCreated, gin.H{"message": "Register User Succesfully", "user": filterRegister})
 }
