@@ -3,13 +3,15 @@ package routes
 import (
 	"backend/lib/utils/response"
 	"backend/src/controllers"
+
 	// "backend/src/middleware"
+	"net/http"
+	"time"
+
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth/limiter"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 func Init(route *gin.Engine) {
@@ -42,9 +44,12 @@ func Init(route *gin.Engine) {
 		}
 	})
 
-	apiGroup := route.Group("/api/v1")
+	apiGroup := route.Group("/api")
 	{
-		apiGroup.POST("/login", controllers.LoginUser)
-		apiGroup.POST("/signup", controllers.RegisterUser)
+		apiV1 := apiGroup.Group("/v1")
+		{
+			apiV1.POST("/login", controllers.LoginUser)
+			apiV1.POST("/signup", controllers.RegisterUser)
+		}
 	}
 }
