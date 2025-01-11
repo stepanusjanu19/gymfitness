@@ -38,5 +38,10 @@ func ConnectDB() *gorm.DB  {
 }
 
 func CloseDB()  {
-	DB.Close()
+	if DB != nil {
+		DB.Close()
+		log.Println("Database connection closed")
+	} else {
+		log.Println("Database connection is nil")
+	}
 }

@@ -7,7 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
+	"github.com/jinzhu/gorm"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,33 +21,36 @@ func Run()  {
 		os.Exit(1)
 	}
 
+	db := config.ConnectDB()
+	if db == nil {
+		fmt.Println("Database connection failed.")
+		os.Exit(1)
+	}
+
 	switch os.Args[1] {
 	case "migrate":
 		migrateFlag.Parse(os.Args[2:])
-		migrateRun()
+		migrateRun(db)
 		os.Exit(1)
 	case "seed":
 		seedFlag.Parse(os.Args[2:])
-		seederRun()
+		seederRun(db)
 		os.Exit(1)
 	default:
-		config.ConnectDB()
 		route := gin.Default()
 		routes.Init(route)
 		route.Run(":5001")
 	}
 }
 
-func migrateRun()  {
+func migrateRun(db *gorm.DB)  {
 	fmt.Println("Running migrations...")
-	db := config.ConnectDB()
 	database.LoadMigrate(db)
 	fmt.Println("Close migrations...")
 }
 
-func seederRun()  {
+func seederRun(db *gorm.DB)  {
 	fmt.Println("Running seeders...")
-	db := config.ConnectDB()
 	database.LoadSeeders(db)
 	fmt.Println("Close seeders...")
 }

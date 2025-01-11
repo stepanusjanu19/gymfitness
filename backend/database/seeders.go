@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"backend/src/model"
 	"github.com/jinzhu/gorm"
@@ -41,6 +42,10 @@ var usersDump = []model.User{
 }
 
 func LoadSeeders(db *gorm.DB)  {
+	if db == nil {
+        fmt.Println("Database connection is nil")
+        return
+    }
 	for i, user := range usersDump {
 		var password string
 		if user.Role == model.Admin {
