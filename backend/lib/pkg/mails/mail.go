@@ -1,13 +1,14 @@
 package mails
 
 import (
+	"strconv"
 	"log"
 	"backend/domain/requests"
 	"backend/lib/structure"
 	"github.com/spf13/viper"
 )
 
-func SendMailerOTP(email string, otp int)  {
+func SendMailerOTP(email string, otp int) error {
 	viper.AutomaticEnv()
 
 	viper.SetEnvPrefix("MAILTRAP")
@@ -33,7 +34,7 @@ func SendMailerOTP(email string, otp int)  {
 		},
 		TemplateUUID: viper.GetString("TEMPLATE_ID"),
 		TemplateVariables: requests.OTPCode{
-			OTPCode: string(otp),
+			OTPCode: strconv.Itoa(otp),
 		},
 	}
 
@@ -49,8 +50,9 @@ func SendMailerOTP(email string, otp int)  {
 
 	response, err := structure.RESTApi(methodData.POST, mailtrapURL, methodData, emailData)
 	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("POST Response:", response)
+		return err
 	}
+
+	log.Println("POST Response:", response)
+	return nil
 }
