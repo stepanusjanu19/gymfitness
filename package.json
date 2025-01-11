@@ -1,8 +1,8 @@
 {
     "name": "api-vercel",
     "version": "1.0.0",
-    "repository": "https://github.com/riccardogiorato/template-go-vercel",
-    "author": "riccardogiorato <https://riccardogiorato.com/>",
+    "repository": "https://gitlab.com/gym_inc/gymfitness",
+    "author": "......",
     "license": "MIT",
     "dependencies": {
       "vercel": "^39.1.3"
