@@ -2,12 +2,16 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"backend/src"
 )
 
-func main()  {
+func Handler(w http.ResponseWriter, r *http.Request) {
 	log.Println("...............API GYM...............")
-	src.Run()
 	log.Println(".....................................")
 }
 
+func main() {
+	http.HandleFunc("/", Handler)
+	src.Run()
+}
