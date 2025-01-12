@@ -1,16 +1,21 @@
 package mails
 
 import (
-	"strconv"
-	"log"
 	"api/domain/requests"
 	"api/lib/structure"
 	"github.com/spf13/viper"
+	"log"
+	"os"
+	"strconv"
 )
 
 func SendMailerOTP(email string, otp int) error {
 
-	viper.SetConfigFile("../.env")
+	envPath := os.Getenv("ENV_PATH")
+	if envPath == "" {
+		envPath = "/go_project/src/gymfitness/api/.env"
+	}
+	viper.SetConfigFile(envPath)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
@@ -21,7 +26,7 @@ func SendMailerOTP(email string, otp int) error {
 	emailData := requests.MailTrapRequestTemplate{
 		From: requests.EmailAddress{
 			Email: viper.GetString("MAIL_FROM_EMAIL2"),
-			Name: viper.GetString("MAIL_FROM_NAME"),
+			Name:  viper.GetString("MAIL_FROM_NAME"),
 		},
 		To: []requests.EmailAddress{
 			{
@@ -41,7 +46,7 @@ func SendMailerOTP(email string, otp int) error {
 	headerValidation["Content-Type"] = "application/json"
 
 	for key, value := range headerValidation {
-		methodData.Headers[key] = value	
+		methodData.Headers[key] = value
 	}
 
 	response, err := structure.RESTApi(methodData.POST, mailtrapURL, methodData, emailData)
