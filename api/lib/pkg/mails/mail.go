@@ -69,7 +69,11 @@ func SendMailerOTP(email string, otp int) error {
 
 func SendMailerOTPbyAPI(email, fullname string, otp int) error {
 
-	viper.SetConfigFile(".env")
+	envPath := os.Getenv("ENV_PATH")
+	if envPath == "" {
+		envPath = "/go_project/src/gymfitness/api/.env"
+	}
+	viper.SetConfigFile(envPath)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)

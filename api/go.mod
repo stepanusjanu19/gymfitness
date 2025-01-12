@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jinzhu/gorm v1.9.16
+	github.com/mailersend/mailersend-go v1.5.1
 	github.com/spf13/viper v1.19.0
 	golang.org/x/crypto v0.31.0
 )
@@ -33,7 +34,6 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lib/pq v1.1.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mailersend/mailersend-go v1.5.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
