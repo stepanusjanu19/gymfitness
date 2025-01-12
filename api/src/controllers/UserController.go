@@ -71,3 +71,32 @@ func RegisterUser(c *gin.Context) {
 
 	response.JSON(c.Writer, http.StatusCreated, gin.H{"message": "Register User Succesfully", "user": filterRegister})
 }
+
+func ValidateOTPAndLogin(c *gin.Context) {
+
+	var req requests.ValidateOTP
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.JSON(c.Writer, http.StatusBadRequest, gin.H{
+			"message": "Invalid request payload",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	user, err := services.ValidateOTPAndLogin(req.Email, req.OTPCode)
+	if err != nil {
+		response.ERROR(c.Writer, http.StatusUnauthorized, gin.Error{
+			Err: err,
+		})
+		return
+	}
+
+	response.JSON(c.Writer, http.StatusOK, gin.H{
+		"message": "OTP validated successfully, Welcome " + func() string {
+			if user.FullName != "" {
+				return user.FullName
+			}
+			return user.FirstName
+		}(),
+	})
+}
