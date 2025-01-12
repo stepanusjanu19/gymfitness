@@ -44,6 +44,20 @@ func FormatStringError(err string) error {
 		return errors.New("error sending request")
 	case strings.Contains(err, "ErrReadResponseBody"):
 		return errors.New("error reading response body")
+	case strings.Contains(err, "usernotverified"):
+		return errors.New("User account is not verified. Please complete OTP verification.")
+	case strings.Contains(err, "verificationCheckError"):
+		return errors.New("Error checking user verification status.")
+	case strings.Contains(err, "otpnotfound"):
+		return errors.New("OTP not found in cache")
+	case strings.Contains(err, "otpexpired"):
+		return errors.New("OTP expired")
+	case strings.Contains(err, "invalidotpinput"):
+		return errors.New("invalid OTP")
+	case strings.Contains(err, "otpalreadyused"):
+		return errors.New("OTP already used")
+	case strings.Contains(err, "otpusedatabase"):
+		return errors.New("OTP not found or already used in the database")
 	default:
 		return errors.New("An unexpected error occurred")
 	}
