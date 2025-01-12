@@ -5,14 +5,12 @@ import (
 	"api/lib/structure"
 	"context"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/mailersend/mailersend-go"
 	"github.com/spf13/viper"
-	"log"
-	"os"
-	"strconv"
 )
 
 //# ===================== ===================== ===================== #
