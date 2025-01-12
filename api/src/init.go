@@ -5,13 +5,21 @@ import (
 	"api/lib/config"
 	"api/src/routes"
 	"flag"
+	"log"
 	"fmt"
 	"os"
 	"github.com/jinzhu/gorm"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func Run()  {
+
+	viper.SetConfigFile(".env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
 
 	migrateFlag := flag.NewFlagSet("migrate", flag.ExitOnError)
 	seedFlag := flag.NewFlagSet("seed", flag.ExitOnError)
@@ -39,7 +47,7 @@ func Run()  {
 	default:
 		route := gin.Default()
 		routes.Init(route)
-		route.Run(":5001")
+		route.Run(":" + viper.GetString("PRODUCTION_PORT") )
 	}
 }
 
