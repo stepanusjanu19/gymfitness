@@ -4,6 +4,7 @@ import (
 	"api/domain/requests"
 	"api/lib/config"
 	"api/lib/helpers"
+	"api/lib/pkg/cache"
 	"api/lib/pkg/mails"
 	"api/lib/utils/formatstring"
 	"api/src/model"
@@ -38,6 +39,14 @@ func Login(email, password string) (model.User, error) {
 
 	if !helpers.VerifyPassword(password, user.Password) {
 		return user, formatstring.FormatStringError("hashedPassword")
+	}
+
+	var verificationUser model.VerificationUser
+	if err := db.Where("user_id = ? AND is_used = ?", user.UserId, true).First(&verificationUser).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return user, formatstring.FormatStringError("usernotverified")
+		}
+		return user, formatstring.FormatStringErrorWithDetails("verificationCheckError", err)
 	}
 
 	return user, nil
@@ -99,10 +108,7 @@ func SignUp(request *requests.Register) (model.User, error) {
 		return newUser, formatstring.FormatStringErrorWithDetails("otpGenerationError", err)
 	}
 
-	err = mails.SendMailerOTPbyAPI(newUser.Email, newUser.FullName, otpGenerate)
-	if err != nil {
-		return newUser, formatstring.FormatStringErrorWithDetails("otpEmailError", err)
-	}
+	cache.SaveOTP(newUser.UserId, otpGenerate)
 
 	verificationUser := model.VerificationUser{
 		UserId: newUser.UserId,
@@ -120,5 +126,42 @@ func SignUp(request *requests.Register) (model.User, error) {
 		return model.User{}, formatstring.FormatStringErrorWithDetails("transactionCommitError", err)
 	}
 
+	err = mails.SendMailerOTPbyAPI(newUser.Email, newUser.FullName, otpGenerate)
+	if err != nil {
+		return newUser, formatstring.FormatStringErrorWithDetails("otpEmailError", err)
+	}
+
 	return newUser, nil
 }
+
+func ValidateOTPAndLogin(email string, otp int) (model.User, error) {
+	db := getDB()
+
+	var user model.User
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return model.User{}, formatstring.FormatStringError("userfound")
+		}
+		return model.User{}, err
+	}
+
+	valid, err := cache.ValidateOTP(user.UserId, otp)
+	if !valid || err != nil {
+		return model.User{}, err
+	}
+
+	var verification model.VerificationUser
+	if err := db.Where("user_id = ? AND otp = ? AND is_used = ?", user.UserId, otp, false).First(&verification).Error; err != nil {
+		return model.User{}, formatstring.FormatStringError("otpusedatabase")
+	}
+
+	verification.IsUsed = true
+	if err := db.Save(&verification).Error; err != nil {
+		return model.User{}, err
+	}
+	
+	cache.MarkOTPAsUsed(user.UserId)
+	return user, nil
+}
+
+
