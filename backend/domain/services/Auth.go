@@ -99,7 +99,7 @@ func SignUp(request *requests.Register) (model.User, error) {
 		return newUser, formatstring.FormatStringErrorWithDetails("otpGenerationError", err)
 	}
 
-	err = mails.SendMailerOTP(newUser.Email, otpGenerate)
+	err = mails.SendMailerOTPbyAPI(newUser.Email, newUser.FullName, otpGenerate)
 	if err != nil {
 		return newUser, formatstring.FormatStringErrorWithDetails("otpEmailError", err)
 	}
