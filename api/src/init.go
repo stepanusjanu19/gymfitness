@@ -5,17 +5,22 @@ import (
 	"api/lib/config"
 	"api/src/routes"
 	"flag"
-	"log"
 	"fmt"
+	"log"
 	"os"
-	"github.com/jinzhu/gorm"
+
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
 )
 
-func Run()  {
+func Run() {
 
-	viper.SetConfigFile(".env")
+	envPath := os.Getenv("ENV_PATH")
+	if envPath == "" {
+		envPath = "/go_project/src/gymfitness/api/.env"
+	}
+	viper.SetConfigFile(envPath)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
@@ -24,7 +29,7 @@ func Run()  {
 	migrateFlag := flag.NewFlagSet("migrate", flag.ExitOnError)
 	seedFlag := flag.NewFlagSet("seed", flag.ExitOnError)
 
-	if len(os.Args) < 2{
+	if len(os.Args) < 2 {
 		fmt.Println("expected 'migrate' or 'seed' subcommands")
 		os.Exit(1)
 	}
@@ -47,17 +52,17 @@ func Run()  {
 	default:
 		route := gin.Default()
 		routes.Init(route)
-		route.Run(":" + viper.GetString("PRODUCTION_PORT") )
+		route.Run(":" + viper.GetString("PRODUCTION_PORT"))
 	}
 }
 
-func migrateRun(db *gorm.DB)  {
+func migrateRun(db *gorm.DB) {
 	fmt.Println("Running migrations...")
 	database.LoadMigrate(db)
 	fmt.Println("Close migrations...")
 }
 
-func seederRun(db *gorm.DB)  {
+func seederRun(db *gorm.DB) {
 	fmt.Println("Running seeders...")
 	database.LoadSeeders(db)
 	fmt.Println("Close seeders...")

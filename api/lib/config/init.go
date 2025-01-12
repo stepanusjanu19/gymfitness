@@ -3,20 +3,25 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
 )
 
-func ConnectDB() *gorm.DB  {
-	viper.SetConfigFile(".env")
+func ConnectDB() *gorm.DB {
+	envPath := os.Getenv("ENV_PATH")
+	if envPath == "" {
+		envPath = "/go_project/src/gymfitness/api/.env"
+	}
+	viper.SetConfigFile(envPath)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
 	}
 
-	dbUrl := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s", 
+	dbUrl := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
 		viper.GetString("DATABASE_HOST"),
 		viper.GetString("DATABASE_PORT"),
 		viper.GetString("DATABASE_USERNAME"),
@@ -34,4 +39,3 @@ func ConnectDB() *gorm.DB  {
 	log.Println("Database Connection established succcessfully")
 	return db
 }
-
