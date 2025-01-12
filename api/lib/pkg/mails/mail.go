@@ -10,7 +10,7 @@ import (
 
 func SendMailerOTP(email string, otp int) error {
 
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("../.env")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
