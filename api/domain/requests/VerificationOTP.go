@@ -15,3 +15,8 @@ type EmailAddress struct {
 type OTPCode struct {
 	OTPCode string `json:"part_code"`
 }
+
+type ValidateOTP struct {
+	Email   string `json:"email" binding:"required,email"`
+	OTPCode int    `json:"otp_code" binding:"required"`
+}

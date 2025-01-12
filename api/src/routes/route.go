@@ -66,6 +66,7 @@ func Init(route *gin.Engine) {
 		{
 			apiV1.POST("/login", controllers.LoginUser)
 			apiV1.POST("/signup", controllers.RegisterUser)
+			apiV1.POST("/verify-user", controllers.ValidateOTPAndLogin)
 		}
 	}
 }
