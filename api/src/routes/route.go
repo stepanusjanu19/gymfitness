@@ -1,8 +1,10 @@
 package routes
 
 import (
+	"api/lib/structure"
 	"api/lib/utils/response"
 	"api/src/controllers"
+	"fmt"
 
 	// "api/src/middleware"
 	"net/http"
@@ -15,10 +17,24 @@ import (
 )
 
 func Init(route *gin.Engine) {
-	route.Use(cors.Default())
 
-	limiter := tollbooth.NewLimiter(1, &limiter.ExpirableOptions{
+	methodData := structure.ConstructorInstance()
+
+	route.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{methodData.GET, methodData.POST, methodData.PUT, methodData.DELETE, methodData.OPTIONS},
+		AllowHeaders:     []string{methodData.Headers["Content-Type"], methodData.Headers["Authorization"]},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	limiter := tollbooth.NewLimiter(10, &limiter.ExpirableOptions{
 		DefaultExpirationTTL: time.Hour,
+	})
+
+	route.Use(func(ctx *gin.Context) {
+		fmt.Printf("Request Method: %s, Path: %s", ctx.Request.Method, ctx.Request.URL.Path)
+		ctx.Next()
 	})
 
 	route.GET("/ping", func(ctx *gin.Context) {
@@ -43,7 +59,7 @@ func Init(route *gin.Engine) {
 			return
 		}
 	})
-
+	
 	apiGroup := route.Group("/api")
 	{
 		apiV1 := apiGroup.Group("/v1")
