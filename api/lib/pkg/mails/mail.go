@@ -1,12 +1,18 @@
 package mails
 
 import (
-	"strconv"
-	"log"
 	"api/domain/requests"
 	"api/lib/structure"
+	"context"
+	"log"
+	"strconv"
+	"time"
+
+	"github.com/mailersend/mailersend-go"
 	"github.com/spf13/viper"
 )
+
+//# ===================== ===================== ===================== #
 
 func SendMailerOTP(email string, otp int) error {
 
@@ -21,7 +27,7 @@ func SendMailerOTP(email string, otp int) error {
 	emailData := requests.MailTrapRequestTemplate{
 		From: requests.EmailAddress{
 			Email: viper.GetString("MAIL_FROM_EMAIL2"),
-			Name: viper.GetString("MAIL_FROM_NAME"),
+			Name:  viper.GetString("MAIL_FROM_NAME"),
 		},
 		To: []requests.EmailAddress{
 			{
@@ -41,7 +47,7 @@ func SendMailerOTP(email string, otp int) error {
 	headerValidation["Content-Type"] = "application/json"
 
 	for key, value := range headerValidation {
-		methodData.Headers[key] = value	
+		methodData.Headers[key] = value
 	}
 
 	response, err := structure.RESTApi(methodData.POST, mailtrapURL, methodData, emailData)
@@ -52,3 +58,68 @@ func SendMailerOTP(email string, otp int) error {
 	log.Println("POST Response:", response)
 	return nil
 }
+
+//# ===================== ===================== ===================== #
+//# ===================== ===================== ===================== #
+
+func SendMailerOTPbyAPI(email, fullname string, otp int) error {
+
+	viper.SetConfigFile(".env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
+
+	tokenMailer := viper.GetString("MAIL_SEND_TOKEN")
+
+	msObject := mailersend.NewMailersend(tokenMailer)
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	subjectText := "OTP Verification"
+
+	from := mailersend.From{
+		Name:  viper.GetString("MAIL_SEND_FROM_NAME"),
+		Email: viper.GetString("MAIL_SEND_FROM_EMAIL"),
+	}
+
+	recipients := []mailersend.Recipient{
+		{
+			Name:  fullname,
+			Email: email,
+		},
+	}
+
+	personalization := []mailersend.Personalization{
+		{
+			Email: email,
+			Data: map[string]interface{}{
+				"part_code":     strconv.Itoa(otp),
+				"support_email": viper.GetString("MAIL_SEND_SUPPORT_EMAIL"),
+			},
+		},
+	}
+
+	mailerTemplateId := viper.GetString("MAIL_SEND_TEMPLATE_ID")
+
+	tag := []string{}
+
+	messageSender := msObject.Email.NewMessage()
+
+	messageSender.SetFrom(from)
+	messageSender.SetRecipients(recipients)
+	messageSender.SetSubject(subjectText)
+	messageSender.SetTemplateID(mailerTemplateId)
+	messageSender.SetPersonalization(personalization)
+
+	messageSender.SetTags(tag)
+
+	res, _ := msObject.Email.Send(ctx, messageSender)
+
+	log.Println(res.Header.Get("X-Message-Id"))
+	return nil
+}
+
+//# ===================== ===================== ===================== #
