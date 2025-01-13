@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var DB *gorm.DB
+
 func ConnectDB() *gorm.DB  {
 	viper.SetConfigFile(".env")
 
@@ -30,6 +32,8 @@ func ConnectDB() *gorm.DB  {
 	if err != nil {
 		log.Fatalf("Could not connect to database :%v", err)
 	}
+
+	DB = db
 
 	log.Println("Database Connection established succcessfully")
 	return db
