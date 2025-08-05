@@ -13,7 +13,10 @@ import (
 func ConnectDB() *gorm.DB {
 	envPath := os.Getenv("ENV_PATH")
 	if envPath == "" {
-		envPath = "/go_project/src/gymfitness/api/.env"
+
+		// envPath = "/go_project/src/gymfitness/api/.env" //read this env for path in prod server path
+		envPath = "./.env"
+
 	}
 	viper.SetConfigFile(envPath)
 
