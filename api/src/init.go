@@ -18,9 +18,15 @@ func Run() {
 
 	envPath := os.Getenv("ENV_PATH")
 	if envPath == "" {
-		envPath = "/go_project/src/gymfitness/api/.env"
+		// envPath = "/go_project/src/gymfitness/api/.env" //read this env for path in prod server path
+		envPath = "./.env"
 	}
 	viper.SetConfigFile(envPath)
+
+	portDefault := viper.GetString("PRODUCTION_PORT")
+	if portDefault == "0" || portDefault == "" {
+		portDefault = "5001"
+	}
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file, %s", err)
@@ -52,7 +58,7 @@ func Run() {
 	default:
 		route := gin.Default()
 		routes.Init(route)
-		route.Run(":" + viper.GetString("PRODUCTION_PORT"))
+		route.Run(":" + portDefault)
 	}
 }
 
