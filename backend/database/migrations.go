@@ -1,9 +1,10 @@
 package database
 
 import (
+	"backend/src/model"
 	"fmt"
 	"log"
-	"backend/src/model"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -12,11 +13,11 @@ func LoadMigrate(db *gorm.DB)  {
         fmt.Println("Database connection is nil")
         return
     }
-	err := db.Debug().DropTableIfExists(&model.User{}, &model.VerificationUser{}).Error
+	err := db.Debug().DropTableIfExists(&model.User{}, &model.VerificationUser{}, &model.Membership{}, &model.Item{}).Error
 	if err != nil {
 		log.Fatalf("cannot drop table: %v", err)
 	}
-	err = db.Debug().AutoMigrate(&model.User{}, &model.VerificationUser{}).Error
+	err = db.Debug().AutoMigrate(&model.User{}, &model.VerificationUser{}, &model.Membership{}, &model.Item{}).Error
 	if err != nil {
 		log.Fatalf("cannot migrate table: %v", err)
 	}

@@ -1,8 +1,11 @@
 package routes
 
 import (
+	"backend/lib/config"
 	"backend/lib/utils/response"
 	"backend/src/controllers"
+	"backend/src/middleware"
+	"backend/src/model"
 
 	// "backend/src/middleware"
 	"net/http"
@@ -44,6 +47,7 @@ func Init(route *gin.Engine) {
 		}
 	})
 
+
 	apiGroup := route.Group("/api")
 	{
 		apiV1 := apiGroup.Group("/v1")
@@ -51,6 +55,12 @@ func Init(route *gin.Engine) {
 			apiV1.POST("/login", controllers.LoginUser)
 			apiV1.POST("/signup", controllers.RegisterUser)
 			apiV1.POST("/verify-user", controllers.ValidateOTPAndLogin)
+
+			apiV1.GET("/item", controllers.FindItem)
+			apiV1.GET("/item/:item_id", controllers.FindItemByID)
+			apiV1.POST("/item", middleware.AuthMiddleware(config.DB, string(model.Admin)), controllers.CreateItem)
+			apiV1.PUT("/item/:item_id", middleware.AuthMiddleware(config.DB, string(model.Admin)), controllers.UpdateItem)
+			apiV1.DELETE("/item/:item_id", middleware.AuthMiddleware(config.DB, string(model.Admin)), controllers.DeleteItem)
 		}
 	}
 }
