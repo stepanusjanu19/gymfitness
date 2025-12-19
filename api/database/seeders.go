@@ -44,6 +44,7 @@ func LoadSeeders(db *gorm.DB) {
 		fmt.Println("Database connection is nil")
 		return
 	}
+
 	for _, user := range usersDump {
 
 		var password string
@@ -64,6 +65,14 @@ func LoadSeeders(db *gorm.DB) {
 		if err != nil {
 			log.Fatalf("cannot seed data: %v", err)
 		}
+
+		var emailDuplicated model.User
+		if err := db.Where("email = ?", user.Email).First(&emailDuplicated).Error; err == nil {
+			log.Printf("User with email %s already exists. Skipping...\n", user.Email)
+			continue
+		}
+
 	}
+
 	log.Println("Seeding completed!")
 }

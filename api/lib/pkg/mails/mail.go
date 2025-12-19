@@ -19,7 +19,8 @@ func SendMailerOTP(email string, otp int) error {
 
 	envPath := os.Getenv("ENV_PATH")
 	if envPath == "" {
-		envPath = "/go_project/src/gymfitness/api/.env"
+		// envPath = "/go_project/src/gymfitness/api/.env" //read this env for path in prod server path
+		envPath = "./.env"
 	}
 	viper.SetConfigFile(envPath)
 
@@ -71,7 +72,8 @@ func SendMailerOTPbyAPI(email, fullname string, otp int) error {
 
 	envPath := os.Getenv("ENV_PATH")
 	if envPath == "" {
-		envPath = "/go_project/src/gymfitness/api/.env"
+		// envPath = "/go_project/src/gymfitness/api/.env"
+		envPath = "./.env"
 	}
 	viper.SetConfigFile(envPath)
 
